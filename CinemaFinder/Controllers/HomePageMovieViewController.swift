@@ -57,7 +57,44 @@ extension HomePageMovieViewController: UITableViewDelegate, UITableViewDataSourc
         return cell
     }
     
-
+    func getData(){
+        _ = Firestore.firestore().collection(cMovie).addSnapshotListener{ querySnapshot, error in
+            
+            guard let snapshot = querySnapshot else {
+                print("Error fetching snapshots: \(error!)")
+                return
+            }
+            self.array.removeAll()
+            if snapshot.documents.count != 0 {
+                for data in snapshot.documents {
+                    let data1 = data.data()
+                    if let name: String = data1[cMName] as? String, let id :String = data1[cMID] as? String, let cast:String = data1[cMCast] as? String, let dName:String = data1[cMDName] as? String {
+                        print("Data Count : \(self.array.count)")
+                        self.array.append(MovieModel(docID: id, name: name, starCast: cast,dName: dName))
+                    }
+                }
+                self.tableView.delegate = self
+                self.tableView.dataSource = self
+                self.tableView.reloadData()
+            }else{
+                Alert.shared.showAlert(message: "No Data Found !!!", completion: nil)
+            }
+        }
+    }
+    
+    func delete(dataID: String) {
+        let ref = Firestore.firestore().collection(cMovie).document(dataID)
+        ref.delete(){ err in
+            if let err = err {
+                print("Error updating document: \(err)")
+                self.navigationController?.popViewController(animated: true)
+            } else {
+                Alert.shared.showAlert(message: "Your movie has been deleted successfully !!!", completion: nil)
+                self.getData()
+            }
+        }
+    }
+}
 
 
 
