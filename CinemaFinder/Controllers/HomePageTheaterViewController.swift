@@ -49,7 +49,11 @@ extension HomePageTheaterViewController: UITableViewDelegate, UITableViewDataSou
             }
         }
         
-
+        cell.buttonDelete.addAction(for: .touchUpInside) {
+            Alert.shared.showAlert("CinemaFinder", actionOkTitle: "Delete", actionCancelTitle: "Cancel", message: "Are you sure you want to delete this theater? ") { (true) in
+                self.delete(dataID: self.array[indexPath.row].docID)
+            }
+        }
         
         return cell
     }
@@ -76,6 +80,19 @@ extension HomePageTheaterViewController: UITableViewDelegate, UITableViewDataSou
                 self.tableView.reloadData()
             }else{
                 Alert.shared.showAlert(message: "No Data Found !!!", completion: nil)
+            }
+        }
+    }
+    
+    func delete(dataID: String) {
+        let ref = Firestore.firestore().collection(cTheater).document(dataID)
+        ref.delete(){ err in
+            if let err = err {
+                print("Error updating document: \(err)")
+                self.navigationController?.popViewController(animated: true)
+            } else {
+                Alert.shared.showAlert(message: "Your Theater has been deleted successfully !!!",completion: nil)
+                self.getData()
             }
         }
     }
