@@ -176,7 +176,28 @@ extension SelectSeatVC: UITextFieldDelegate {
         }
     }
     
-
+    func getData9AM(){
+        _ = Firestore.firestore().collection(cBooking).whereField(cDate, isEqualTo: self.txtDate.text?.trim() ?? "").whereField(cMID, isEqualTo: movieData.docID).whereField(cTime, isEqualTo: "9:00 AM").whereField(cTID, isEqualTo: theaterData.docID).addSnapshotListener{ querySnapshot, error in
+            
+            guard let snapshot = querySnapshot else {
+                print("Error fetching snapshots: \(error!)")
+                return
+            }
+            var bookedCount = 0
+            if snapshot.documents.count != 0 {
+                for data in snapshot.documents {
+                    let data1 = data.data()
+                    if let seat : Int = data1[cSeats] as? Int {
+                        bookedCount += seat
+                    }
+                }
+            }
+            
+            if !(10 > (bookedCount+self.count)){
+                self.btn9AM.backgroundColor = .lightGray
+                self.btn9AM.isUserInteractionEnabled = false
+            }
+        }
     }
 }
 
