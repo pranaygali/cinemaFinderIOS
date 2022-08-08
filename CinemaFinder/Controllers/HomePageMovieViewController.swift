@@ -35,8 +35,29 @@ class HomePageMovieViewController: UIViewController {
 
 extension HomePageMovieViewController: UITableViewDelegate, UITableViewDataSource {
     
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        self.array.count
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "MovieCell", for: indexPath) as! MovieCell
+        cell.configCell(data: self.array[indexPath.row])
+        cell.buttonEdit.addAction(for: .touchUpInside) {
+            if let vc = UIStoryboard.main.instantiateViewController(withClass: AddMovieViewController.self) {
+                vc.data = self.array[indexPath.row]
+                self.navigationController?.pushViewController(vc, animated: true)
+            }
+        }
+        
+        cell.buttonDelete.addAction(for: .touchUpInside) {
+            Alert.shared.showAlert("CinemaFinder", actionOkTitle: "Delete", actionCancelTitle: "Cancel", message: "Are you sure you want to delete this movie? ") { (true) in
+                self.delete(dataID: self.array[indexPath.row].docID)
+            }
+        }
+        return cell
+    }
+    
 
-}
 
 
 
