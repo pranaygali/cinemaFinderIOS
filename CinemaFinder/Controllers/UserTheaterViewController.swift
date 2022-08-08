@@ -60,6 +60,20 @@ extension UserTheaterViewController: UITableViewDelegate, UITableViewDataSource 
                 return
             }
             self.array.removeAll()
+            if snapshot.documents.count != 0 {
+                for data in snapshot.documents {
+                    let data1 = data.data()
+                    if let name: String = data1[cTName] as? String, let address: String = data1[cTAddress] as? String, let id :String = data1[cTID] as? String {
+                        print("Data Count : \(self.array.count)")
+                        self.array.append(TheaterModel(docID: id, name: name, location: address))
+                    }
+                }
+                self.tableView.delegate = self
+                self.tableView.dataSource = self
+                self.tableView.reloadData()
+            }else{
+                Alert.shared.showAlert(message: "No Data Found !!!", completion: nil)
+            }
         }
     }
     
