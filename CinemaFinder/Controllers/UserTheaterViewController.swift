@@ -36,12 +36,27 @@ extension UserTheaterViewController: UITableViewDelegate, UITableViewDataSource 
         self.array.count
     }
     
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: "TheaterCellUser", for: indexPath) as! TheaterCellUser
+        cell.labelName.text = self.array[indexPath.row].name
+        let tap = UITapGestureRecognizer()
+        tap.addAction {
+            if let vc = UIStoryboard.main.instantiateViewController(withClass: SelectSeatVC.self){
+                vc.movieData = self.movieData
+                vc.theaterData = self.array[indexPath.row]
+                self.navigationController?.pushViewController(vc, animated: true)
+            }
+        }
+        cell.viewMain.isUserInteractionEnabled = true
+        cell.viewMain.addGestureRecognizer(tap)
+        return cell
+    }
     
     func getData(){
         _ = Firestore.firestore().collection(cTheater).addSnapshotListener{ querySnapshot, error in
             
             guard let snapshot = querySnapshot else {
-                print("Error fetching: \(error!)")
+                print("Error fetching snapshots: \(error!)")
                 return
             }
             self.array.removeAll()
