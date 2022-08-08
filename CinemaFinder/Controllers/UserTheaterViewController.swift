@@ -32,6 +32,9 @@ class UserTheaterViewController: UIViewController {
 
 extension UserTheaterViewController: UITableViewDelegate, UITableViewDataSource {
     
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        self.array.count
+    }
     
     
     func getData(){
