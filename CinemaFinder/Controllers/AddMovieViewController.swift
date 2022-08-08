@@ -54,5 +54,43 @@ class AddMovieViewController: UIViewController {
         }
     }
     
-    
+    func addMovieData(name:String,cast: String,dName: String) {
+                var ref : DocumentReference? = nil
+                ref = Firestore.firestore().collection(cMovie).addDocument(data:
+                                                                            [
+                                                                                cMID: "",
+                                                                                cMName : name,
+                                                                                cMCast: cast,
+                                                                                cMDName: dName,
+                                                                            ])
+                {  err in
+                    if let err = err {
+                        print("Error adding document: \(err)")
+                    } else {
+                        print("Document added with ID: \(ref!.documentID)")
+                        self.update(dataID: ref!.documentID,name: name,cast: cast,dName: dName)
+                    }
+                }
+            }
+            
+            func update(dataID: String,name:String,cast: String,dName: String) {
+                let ref = Firestore.firestore().collection(cMovie).document(dataID)
+                ref.updateData([
+                    cMID: dataID,
+                    cMName : name,
+                    cMCast: cast,
+                    cMDName: dName,
+                ]){ err in
+                    if let err = err {
+                        print("Error updating document: \(err)")
+                        self.navigationController?.popViewController(animated: true)
+                    } else {
+                        Alert.shared.showAlert(message: self.data != nil ? "Your Movie has been updated successfully !!!" : "Your Movie has been added successfully !!!") { (true) in
+                            self.navigationController?.popViewController(animated: true)
+                        }
+                    }
+                }
+            }
+        }
+
 
