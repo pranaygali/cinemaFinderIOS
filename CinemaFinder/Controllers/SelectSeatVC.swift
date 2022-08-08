@@ -51,7 +51,9 @@ class SelectSeatVC: UIViewController {
     }
     
     
-
+    func checkPayment() -> String {
+    
+    }
     
     @IBAction func btnPaymentClick(_ sender: UIButton) {
         
@@ -123,33 +125,80 @@ extension SelectSeatVC: UITextFieldDelegate {
     }
     
     
-    func createOrder(paymentId: String, time: String, date: String) {
-        let total = (self.count * 15)
-        var ref : DocumentReference? = nil
-        ref = Firestore.firestore().collection(cBooking).addDocument(data:[
-                                                                            cUID: GFunction.user.docID,
-                                                                            cTID : self.theaterData.docID,
-                                                                            cMID : self.movieData.docID,
-                                                                            cTime: time,
-                                                                            cDate: date,
-                                                                            cTotalPayment: total,
-                                                                            cSeats: self.count
-                                                                        ])
-        {  err in
-            if let err = err {
-                print("Error adding document: \(err)")
-            } else {
-                print("Document added with ID: \(ref!.documentID)")
-                Alert.shared.showAlert(message: "Your Ticket has been booked successfully !!!") { Bool in
-                    UIApplication.shared.setTab()
+    
+    
+    func getData3PM(){
+        _ = Firestore.firestore().collection(cBooking).whereField(cDate, isEqualTo: self.txtDate.text?.trim() ?? "").whereField(cMID, isEqualTo: movieData.docID).whereField(cTime, isEqualTo: "3:00 PM").whereField(cTID, isEqualTo: theaterData.docID).addSnapshotListener{ querySnapshot, error in
+            
+            guard let snapshot = querySnapshot else {
+                print("Error fetching snapshots: \(error!)")
+                return
+            }
+            var bookedCount = 0
+            if snapshot.documents.count != 0 {
+                for data in snapshot.documents {
+                    let data1 = data.data()
+                    if let seat : Int = data1[cSeats] as? Int {
+                        bookedCount += seat
+                    }
                 }
+            }
+            
+            if !(10 > (bookedCount+self.count)){
+                self.btn3PM.backgroundColor = .lightGray
+                self.btn3PM.isUserInteractionEnabled = false
             }
         }
     }
     
     
+    func getData9PM(){
+        _ = Firestore.firestore().collection(cBooking).whereField(cDate, isEqualTo: self.txtDate.text?.trim() ?? "").whereField(cMID, isEqualTo: movieData.docID).whereField(cTime, isEqualTo: "9:00 PM").whereField(cTID, isEqualTo: theaterData.docID).addSnapshotListener{ querySnapshot, error in
+            
+            guard let snapshot = querySnapshot else {
+                print("Error fetching snapshots: \(error!)")
+                return
+            }
+            var bookedCount = 0
+            if snapshot.documents.count != 0 {
+                for data in snapshot.documents {
+                    let data1 = data.data()
+                    if let seat : Int = data1[cSeats] as? Int {
+                        bookedCount += seat
+                    }
+                }
+            }
+            
+            if !(10 > (bookedCount+self.count)){
+                self.btn9PM.backgroundColor = .lightGray
+                self.btn9PM.isUserInteractionEnabled = false
+            }
+        }
+    }
     
-    
+    func getData9AM(){
+        _ = Firestore.firestore().collection(cBooking).whereField(cDate, isEqualTo: self.txtDate.text?.trim() ?? "").whereField(cMID, isEqualTo: movieData.docID).whereField(cTime, isEqualTo: "9:00 AM").whereField(cTID, isEqualTo: theaterData.docID).addSnapshotListener{ querySnapshot, error in
+            
+            guard let snapshot = querySnapshot else {
+                print("Error fetching snapshots: \(error!)")
+                return
+            }
+            var bookedCount = 0
+            if snapshot.documents.count != 0 {
+                for data in snapshot.documents {
+                    let data1 = data.data()
+                    if let seat : Int = data1[cSeats] as? Int {
+                        bookedCount += seat
+                    }
+                }
+            }
+            
+            if !(10 > (bookedCount+self.count)){
+                self.btn9AM.backgroundColor = .lightGray
+                self.btn9AM.isUserInteractionEnabled = false
+            }
+        }
+    }
 }
 
     
