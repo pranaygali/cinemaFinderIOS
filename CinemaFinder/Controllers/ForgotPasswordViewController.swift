@@ -4,6 +4,8 @@
 
 
 import UIKit
+import FirebaseFirestore
+import FirebaseAuth
 
 class ForgotPasswordVC: UIViewController {
 
@@ -16,6 +18,11 @@ class ForgotPasswordVC: UIViewController {
         if sender == btnCancel {
             self.navigationController?.popViewController(animated: true)
         }else if sender == btnSubmit {
+            
+            FirebaseAuth.Auth.auth().sendPasswordReset(withEmail: txtEmail.text?.trim() ?? ""){
+                error in
+            }
+            Alert.shared.showAlert(message: "Reset link has been sent succesfully", completion: nil)
             
         }
     }
