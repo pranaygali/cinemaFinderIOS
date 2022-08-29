@@ -8,6 +8,7 @@ class UserHomeViewController: UIViewController {
 
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var searchBar: UISearchBar!
+    @IBOutlet weak var labelNOData: UILabel!
     
     var pendingItem: DispatchWorkItem?
     var pendingRequest: DispatchWorkItem?
@@ -26,6 +27,8 @@ class UserHomeViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        self.labelNOData.isHidden = true
+        self.tableView.isHidden = false
         self.getData()
         self.searchBar.delegate = self
         // Do any additional setup after loading the view.
@@ -36,7 +39,13 @@ class UserHomeViewController: UIViewController {
 extension UserHomeViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        self.arrayData.count
+        self.labelNOData.isHidden = true
+        self.tableView.isHidden = false
+        if self.arrayData.count == 0 {
+            self.labelNOData.isHidden = false
+            self.tableView.isHidden = true
+        }
+       return self.arrayData.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -65,17 +74,20 @@ extension UserHomeViewController: UITableViewDelegate, UITableViewDataSource {
             if snapshot.documents.count != 0 {
                 for data in snapshot.documents {
                     let data1 = data.data()
-                    if let name: String = data1[cMName] as? String, let id :String = data1[cMID] as? String, let cast:String = data1[cMCast] as? String, let dName:String = data1[cMDName] as? String {
+                    if let name: String = data1[cMName] as? String, let id :String = data1[cMID] as? String, let cast:String = data1[cMCast] as? String, let dName:String = data1[cMDName] as? String, let imageURL: String = data1[cImageURL] as? String {
                         print("Data Count : \(self.array.count)")
-                        self.array.append(MovieModel(docID: id, name: name, starCast: cast,dName: dName))
+                        self.array.append(MovieModel(docID: id, name: name, starCast: cast,dName: dName, imageurl: imageURL))
                     }
                 }
                 self.arrayData = self.array
+                self.labelNOData.isHidden = true
+                self.tableView.isHidden = false
                 self.tableView.delegate = self
                 self.tableView.dataSource = self
                 self.tableView.reloadData()
             }else{
-                Alert.shared.showAlert(message: "No Data Found !!!", completion: nil)
+                self.labelNOData.isHidden = false
+                self.tableView.isHidden = true
             }
         }
     }
@@ -87,15 +99,18 @@ class MovieCellUser: UITableViewCell {
     @IBOutlet weak var imageViewProfile: UIImageView!
     @IBOutlet weak var labelName: UILabel!
     @IBOutlet weak var labelPrice: UILabel!
-    @IBOutlet weak var buttonDelete: UIButton!
+    @IBOutlet weak var labelDirector: UILabel!
+    
     
     func configCell(data: MovieModel) {
         self.labelName.text = data.name
-        self.labelPrice.text = "Price: $15"
+        self.labelPrice.text = data.starCast
+        self.labelDirector.text = data.dName
+        self.imageViewProfile.setImgWebUrl(url: data.imageurl, isIndicator: true)
     }
     
     override func awakeFromNib() {
-        self.buttonDelete.layer.cornerRadius = 10.0
+        
         self.imageViewProfile.layer.cornerRadius = 10.0
     }
 }
