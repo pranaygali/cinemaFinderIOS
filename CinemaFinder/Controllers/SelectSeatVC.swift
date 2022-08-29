@@ -329,6 +329,7 @@ extension SelectSeatVC: UITextFieldDelegate {
         session.authentication = Authentication.apiKey(apikey)
         
         let from = Address(email: devemail, name: "CinemaFinder")
+        let template = Email(personalizations: [personalization], from: from, templateID: "d-XXXXXXXXXXXXXXXXXXXXXXXXXXXXX", subject: "Your booking has been confirmed!!!")
        
         
         do {
@@ -344,7 +345,8 @@ extension SelectSeatVC: UITextFieldDelegate {
                 }
             })
         }catch(let error){
-           
+            print("ERROR: ")
+            completion(.failure(error))
         }
     }
 }
