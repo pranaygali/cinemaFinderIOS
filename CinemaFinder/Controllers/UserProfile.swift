@@ -15,6 +15,7 @@ class UserProfile: UIViewController {
     @IBOutlet weak var imgProfile: UIImageView!
     @IBOutlet weak var btnSaveChanges: UIButton!
     @IBOutlet weak var btnReset: UIButton!
+    @IBOutlet weak var btnSeeHistory: UIButton!
     
     let email: String = FirebaseAuth.Auth.auth().currentUser?.email ?? ""
     
@@ -30,6 +31,10 @@ class UserProfile: UIViewController {
                 self.update(dataID: FirebaseAuth.Auth.auth().currentUser?.uid ?? "", name: self.txtName.text?.trim() ?? "", phone: self.txtContact.text?.trim() ?? "")
             }else{
                 Alert.shared.showAlert(message: error, completion: nil)
+            }
+        }else if sender == btnSeeHistory {
+            if let vc = UIStoryboard.main.instantiateViewController(withClass: HistoryViewController.self) {
+                self.navigationController?.pushViewController(vc, animated: true)
             }
         }
     }
