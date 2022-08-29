@@ -60,40 +60,40 @@ class UserProfile: UIViewController {
     }
 
     
-//    func getData(){
-//        Firestore.firestore().collection(cUser).whereField(cEmail, isEqualTo: email).addSnapshotListener{querySnapshot, error in
-//            guard let snapshot = querySnapshot else {
-//                print("Error fetching snapshots: \(error!)")
-//                return
-//            }
-//            let data1 = snapshot.documents[0].data()
-//            if let name: String = data1[cName] as? String, let email: String = data1[cEmail] as? String, let phone: String = data1[cPhone] as? String {
-//                //                GFunction.user = UserModel(docID: "", name: name, email: email, password: password, phone: phone)
-//                self.txtEmail.text = FirebaseAuth.Auth.auth().currentUser?.email
-//                self.txtName.text = name
-//                self.txtContact.text = phone
-//            }
-//            
-//            self.btnSaveChanges.layer.cornerRadius = 10.0
-//            // Do any additional setup after loading the view.
-//        }
-//    }
-//    
-//    func update(dataID: String,name:String,phone: String) {
-//        let ref = Firestore.firestore().collection(cUser).document(dataID)
-//        ref.updateData([
-//            cPhone: phone,
-//            cName: name,
-//        ]){ err in
-//            if let err = err {
-//                print("Error updating document: \(err)")
-//                self.navigationController?.popViewController(animated: true)
-//            } else {
-//                print("Document successfully updated")
-//                Alert.shared.showAlert(message: "Your profile has been updated successfully !!!") { (true) in
-//                    self.navigationController?.popViewController(animated: true)
-//                }
-//            }
-//        }
-//    }
+    func getData(){
+        Firestore.firestore().collection(cUser).whereField(cEmail, isEqualTo: email).addSnapshotListener{querySnapshot, error in
+            guard let snapshot = querySnapshot else {
+                print("Error fetching snapshots: \(error!)")
+                return
+            }
+            let data1 = snapshot.documents[0].data()
+            if let name: String = data1[cName] as? String, let email: String = data1[cEmail] as? String, let phone: String = data1[cPhone] as? String {
+                //                GFunction.user = UserModel(docID: "", name: name, email: email, password: password, phone: phone)
+                self.txtEmail.text = FirebaseAuth.Auth.auth().currentUser?.email
+                self.txtName.text = name
+                self.txtContact.text = phone
+            }
+            
+            self.btnSaveChanges.layer.cornerRadius = 10.0
+            // Do any additional setup after loading the view.
+        }
+    }
+
+    func update(dataID: String,name:String,phone: String) {
+        let ref = Firestore.firestore().collection(cUser).document(dataID)
+        ref.updateData([
+            cPhone: phone,
+            cName: name,
+        ]){ err in
+            if let err = err {
+                print("Error updating document: \(err)")
+                self.navigationController?.popViewController(animated: true)
+            } else {
+                print("Document successfully updated")
+                Alert.shared.showAlert(message: "Your profile has been updated successfully !!!") { (true) in
+                    self.navigationController?.popViewController(animated: true)
+                }
+            }
+        }
+    }
 }
