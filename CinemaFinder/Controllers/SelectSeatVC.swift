@@ -206,9 +206,7 @@ extension SelectSeatVC: UITextFieldDelegate {
                 print("Error adding document: \(err)")
             } else {
                 print("Document added with ID: \(ref!.documentID)")
-                Alert.shared.showAlert(message: "Your Ticket has been booked successfully !!!") { Bool in
-                    self.emailSend(email: GFunction.user.email, name: GFunction.user.fullName,movie: self.movieData.name, time:time,date:date,seats:self.count ,theatername:self.theaterData.name,address:self.theaterData.location)
-                }
+                Alert.shared.showAlert(message: "Your Ticket has been booked successfully !!!") 
             }
         }
     }
@@ -285,67 +283,7 @@ extension SelectSeatVC: UITextFieldDelegate {
             }
         }
     }
-    
-    func emailSend(email: String, name:String,movie:String,time:String,date:String,seats:Int,theatername:String,address:String){
-        self.sendEmail( email: email, name:name,movie: movie,time:time,date:date,seats:seats,theatername:theatername,address:address){ [unowned self] (result) in
-            DispatchQueue.main.async {
-                switch result{
-                    case .success(_):
-                        Alert.shared.showAlert(message: "Your booking has been confirmed successfully !!!") { (bool) in
-                            UIApplication.shared.setTab()
-                        }
-                    case .failure(_):
-                        Alert.shared.showAlert(message: "Error", completion: nil)
-                }
-            }
-            
-        }
-    }
-    
-    func sendEmail(email: String, name:String,movie:String,time:String,date:String,seats:Int,theatername:String,address:String, completion: @escaping (Result<Void,Error>) -> Void) {
-        
-        let count = String(seats);
-        let price : Int = (seats * 15);
-        
-        
-        
-        let data : [String:String] = [
-            "name": name,
-            "email": email,
-            "movie":movie,
-            "time":time,
-            "date":date,
-            "theatername":theatername,
-            "address":address,
-            "seats":count,
-            "price":String(price),
-            
-        ]
-        
-        
-        let personalization = TemplatedPersonalization(dynamicTemplateData: data, recipients: email)
-        let session = Session()
-        session.authentication = Authentication.apiKey(apikey)
-        
-       
-        
-        do {
-            try session.send(request: template, completionHandler: { (result) in
-                switch result {
-                    case .success(let response):
-                        print("Response : \(response)")
-                        completion(.success(()))
-                        
-                    case .failure(let error):
-                        print("Error : \(error)")
-                        completion(.failure(error))
-                }
-            })
-        }catch(let error){
-            print("ERROR: ")
-            completion(.failure(error))
-        }
-    }
+
 }
 
 extension SelectSeatVC : RazorpayPaymentCompletionProtocol {
