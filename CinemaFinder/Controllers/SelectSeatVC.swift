@@ -76,10 +76,14 @@ class SelectSeatVC: UIViewController {
         
         if error.isEmpty {
             self.price = Float(15 * self.count * 100)
+
             
             let options: [String:Any] = [ "amount" : price.description,
                                          "description" : "Booking Movie Ticket",
                                          "currency": "CAD",
+
+            let options: [String:Any] = ["amount" : price.description,
+                                         "description" : "Booking Movie Ticket",
                                          "image": UIImage(named: "img"),
                                          "name" : "Cinema Finder",
                                          "prefill" :
@@ -199,8 +203,13 @@ extension SelectSeatVC: UITextFieldDelegate {
                                                                             cMID : self.movieData.docID,
                                                                             cTime: time,
                                                                             cDate: date,
+
                                                                             cTotalPayment: "$\(total)",
                                                                             cSeats: "\(self.count)"
+
+                                                                            cTotalPayment: total,
+                                                                            cSeats: self.count
+
                                                                         ])
         {  err in
             if let err = err {
@@ -208,7 +217,11 @@ extension SelectSeatVC: UITextFieldDelegate {
             } else {
                 print("Document added with ID: \(ref!.documentID)")
                 Alert.shared.showAlert(message: "Your Ticket has been booked successfully !!!") { Bool in
+
                     self.emailSend(email: GFunction.user.email, name: GFunction.user.fullName,movie: self.movieData.name, time:time,date:date,seats:self.count ,theatername:self.theaterData.name,address:self.theaterData.location)
+
+                    UIApplication.shared.setTab()
+
                 }
             }
         }
