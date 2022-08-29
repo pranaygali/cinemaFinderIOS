@@ -76,14 +76,9 @@ class SelectSeatVC: UIViewController {
         
         if error.isEmpty {
             self.price = Float(15 * self.count * 100)
-
-            
-            let options: [String:Any] = [ "amount" : price.description,
-                                         "description" : "Booking Movie Ticket",
-                                         "currency": "CAD",
-
             let options: [String:Any] = ["amount" : price.description,
                                          "description" : "Booking Movie Ticket",
+                                         "currency": "CAD",
                                          "image": UIImage(named: "img"),
                                          "name" : "Cinema Finder",
                                          "prefill" :
@@ -203,13 +198,8 @@ extension SelectSeatVC: UITextFieldDelegate {
                                                                             cMID : self.movieData.docID,
                                                                             cTime: time,
                                                                             cDate: date,
-
                                                                             cTotalPayment: "$\(total)",
                                                                             cSeats: "\(self.count)"
-
-                                                                            cTotalPayment: total,
-                                                                            cSeats: self.count
-
                                                                         ])
         {  err in
             if let err = err {
@@ -217,11 +207,7 @@ extension SelectSeatVC: UITextFieldDelegate {
             } else {
                 print("Document added with ID: \(ref!.documentID)")
                 Alert.shared.showAlert(message: "Your Ticket has been booked successfully !!!") { Bool in
-
                     self.emailSend(email: GFunction.user.email, name: GFunction.user.fullName,movie: self.movieData.name, time:time,date:date,seats:self.count ,theatername:self.theaterData.name,address:self.theaterData.location)
-
-                    UIApplication.shared.setTab()
-
                 }
             }
         }
@@ -317,8 +303,7 @@ extension SelectSeatVC: UITextFieldDelegate {
     }
     
     func sendEmail(email: String, name:String,movie:String,time:String,date:String,seats:Int,theatername:String,address:String, completion: @escaping (Result<Void,Error>) -> Void) {
-        let apikey = "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"
-        let devemail = "udaydheerajreddy@gmail.com"
+        
         let count = String(seats);
         let price : Int = (seats * 15);
         
@@ -342,8 +327,7 @@ extension SelectSeatVC: UITextFieldDelegate {
         let session = Session()
         session.authentication = Authentication.apiKey(apikey)
         
-        let from = Address(email: devemail, name: "CinemaFinder")
-        let template = Email(personalizations: [personalization], from: from, templateID: "d-62b2549a4a0b454d9d0dd4e37298109b", subject: "Your booking has been confirmed!!!")
+       
         
         do {
             try session.send(request: template, completionHandler: { (result) in
