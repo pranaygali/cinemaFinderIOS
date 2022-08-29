@@ -73,22 +73,22 @@ class AddTheaterViewController: UIViewController {
         }
     }
     
-    func update(dataID: String,name:String,address: String) {
-        let ref = Firestore.firestore().collection(cTheater).document(dataID)
-        ref.updateData([
-            cTID: dataID,
-            cTName: name,
-            cTAddress: address,
-        ]){ err in
-            if let err = err {
-                print("Error updating document: \(err)")
-                self.navigationController?.popViewController(animated: true)
-            } else {
-                print("Document successfully updated")
-                Alert.shared.showAlert(message: self.data != nil ? "Your Theater has been updated successfully !!!" :  "Your Theater has been added successfully !!!") { (true) in
-                    self.navigationController?.popViewController(animated: true)
-                }
-            }
-        }
-    }
+//    func update(dataID: String,name:String,address: String) {
+//        let ref = Firestore.firestore().collection(cTheater).document(dataID)
+//        ref.updateData([
+//            cTID: dataID,
+//            cTName: name,
+//            cTAddress: address,
+//        ]){ err in
+//            if let err = err {
+//                print("Error updating document: \(err)")
+//                self.navigationController?.popViewController(animated: true)
+//            } else {
+//                print("Document successfully updated")
+//                Alert.shared.showAlert(message: self.data != nil ? "Your Theater has been updated successfully !!!" :  "Your Theater has been added successfully !!!") { (true) in
+//                    self.navigationController?.popViewController(animated: true)
+//                }
+//            }
+//        }
+//    }
 }
