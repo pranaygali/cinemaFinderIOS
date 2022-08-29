@@ -163,26 +163,26 @@ class AddMovieViewController: UIViewController, UINavigationControllerDelegate {
         }
     }
     
-//    func update(dataID: String,name:String,cast: String,dName: String) {
-//        let ref = Firestore.firestore().collection(cMovie).document(dataID)
-//        ref.updateData([
-//            cMID: dataID,
-//            cMName : name,
-//            cMCast: cast,
-//            cMDName: dName,
-//            cImageURL: self.imageURL
-//        ]){ err in
-//            if let err = err {
-//                print("Error updating document: \(err)")
-//                self.navigationController?.popViewController(animated: true)
-//            } else {
-//                Alert.shared.showAlert(message: self.data != nil ? "Your Movie has been updated successfully !!!" : "Your Movie has been added successfully !!!") { (true) in
-//                    self.navigationController?.popViewController(animated: true)
-//                }
-//            }
-//        }
-//    }
-//}
+    func update(dataID: String,name:String,cast: String,dName: String) {
+        let ref = Firestore.firestore().collection(cMovie).document(dataID)
+        ref.updateData([
+            cMID: dataID,
+            cMName : name,
+            cMCast: cast,
+            cMDName: dName,
+            cImageURL: self.imageURL
+        ]){ err in
+            if let err = err {
+                print("Error updating document: \(err)")
+                self.navigationController?.popViewController(animated: true)
+            } else {
+                Alert.shared.showAlert(message: self.data != nil ? "Your Movie has been updated successfully !!!" : "Your Movie has been added successfully !!!") { (true) in
+                    self.navigationController?.popViewController(animated: true)
+                }
+            }
+        }
+    }
+}
 
 
 //MARK:- UIImagePickerController Delegate Methods
