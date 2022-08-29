@@ -4,6 +4,7 @@
 
 
 import UIKit
+import Razorpay
 
 class SelectSeatVC: UIViewController {
 
@@ -24,6 +25,8 @@ class SelectSeatVC: UIViewController {
     var datePicker = UIDatePicker()
     var count = 1
     let toolBar = UIToolbar()
+    var razorpayObj : Razorpay.RazorpayCheckout? = nil
+    let razorpayKey = "rzp_test_HCVYCp9beI7gNu"
     var movieData: MovieModel!
     var theaterData: TheaterModel!
     var isSelectTime: Bool = false
@@ -31,6 +34,9 @@ class SelectSeatVC: UIViewController {
     
     
     @IBAction func btnClick(_ sender: UIButton) {
+        
+        var totalPrice = 0
+        
         if sender == self.btn9AM {
             self.setupButton(sender1: self.btn9AM, sender2: self.btn3PM, sender3: self.btn9PM)
         } else if sender == self.btn3PM {
@@ -40,23 +46,54 @@ class SelectSeatVC: UIViewController {
         } else if sender == self.btnMinus {
             if self.count > 1 {
                 self.count -= 1
+                totalPrice = self.count * 15
                 self.lblCount.text = self.count.description
+                self.lblPrice.text = "Total Price : $" + totalPrice.description
             }
         } else if sender == btnPlus {
             if self.count < 5 {
                 self.count += 1
+                totalPrice = self.count * 15
                 self.lblCount.text = self.count.description
+                self.lblPrice.text = "Total Price : $" + totalPrice.description
             }
         }
     }
     
     
     func checkPayment() -> String {
-    
+        if self.txtDate.text == "" {
+            return "Please select date"
+        }else if !self.isSelectTime {
+            return "Please select time"
+        }
+        return ""
     }
     
     @IBAction func btnPaymentClick(_ sender: UIButton) {
         
+        let error = self.checkPayment()
+        
+        if error.isEmpty {
+            self.price = Float(15 * self.count * 100)
+            let options: [String:Any] = ["amount" : price.description,
+                                         "description" : "Booking Movie Ticket",
+                                         "currency": "CAD",
+                                         "image": UIImage(named: "img"),
+                                         "name" : "Cinema Finder",
+                                         "prefill" :
+                                            ["contact" : GFunction.user.contactNumber,
+                                             "email":GFunction.user.email],
+                                         "theme" : "#F00000"]
+            
+            if let rzp = self.razorpayObj {
+                rzp.open(options)
+            } else {
+                print("Unable to initialize")
+            }
+        }else{
+            Alert.shared.showAlert(message: error, completion: nil)
+        }
         
     }
     
@@ -65,19 +102,46 @@ class SelectSeatVC: UIViewController {
     }
     
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        razorpayObj = RazorpayCheckout.initWithKey(razorpayKey, andDelegate: self)
+        
+        
+        self.btn9AM.layer.cornerRadius = 10.0
+        self.btn3PM.layer.cornerRadius = 10.0
+        self.btn9PM.layer.cornerRadius = 10.0
+        self.vwSeatCount.layer.cornerRadius = 10.0
+        self.btnPayment.layer.cornerRadius = 10.0
+        self.txtDate.delegate = self
+        
+        self.lblCount.text = self.count.description
+        self.setUpView()
+        // Do any additional setup after loading the view.
+    }
+    
     func setupButton(sender1: UIButton, sender2: UIButton, sender3: UIButton) {
         self.isSelectTime = true
-        sender1.layer.borderColor = UIColor.green.cgColor
-        sender1.layer.borderWidth = 1.0
+        sender1.backgroundColor = UIColor.blue
         sender1.isSelected = true
         sender2.isSelected = false
-        sender2.layer.borderWidth = 0.0
+        sender2.backgroundColor = UIColor.hexStringToUIColor(hex: "#E90000")
         sender3.isSelected = false
-        sender3.layer.borderWidth = 0.0
+        sender3.backgroundColor = UIColor.hexStringToUIColor(hex: "#E90000")
     }
     
     func setUpView(){
         self.txtDate.inputView = datePicker
+        
+        let calendar = Calendar(identifier: .gregorian)
+        let currentDate = Date()
+        var components = DateComponents()
+        components.calendar = calendar
+        components.day = 7
+        let maxDate = calendar.date(byAdding: components, to: currentDate)!
+        
+        self.datePicker.maximumDate = maxDate
+        
+        
         let doneButton = UIBarButtonItem(title: "Done", style: UIBarButtonItem.Style.plain, target: self, action: #selector(self.doneButtonTapped))
         let spaceButton = UIBarButtonItem(barButtonSystemItem: UIBarButtonItem.SystemItem.flexibleSpace, target: nil, action: nil)
         toolBar.setItems([spaceButton, doneButton], animated: false)
@@ -125,7 +189,29 @@ extension SelectSeatVC: UITextFieldDelegate {
     }
     
     
-    
+    func createOrder(paymentId: String, time: String, date: String) {
+        let total = (self.count * 15)
+        var ref : DocumentReference? = nil
+        ref = Firestore.firestore().collection(cBooking).addDocument(data:[
+                                                                            cUID: GFunction.user.docID,
+                                                                            cTID : self.theaterData.docID,
+                                                                            cMID : self.movieData.docID,
+                                                                            cTime: time,
+                                                                            cDate: date,
+                                                                            cTotalPayment: "$\(total)",
+                                                                            cSeats: "\(self.count)"
+                                                                        ])
+        {  err in
+            if let err = err {
+                print("Error adding document: \(err)")
+            } else {
+                print("Document added with ID: \(ref!.documentID)")
+                Alert.shared.showAlert(message: "Your Ticket has been booked successfully !!!") { Bool in
+                    self.emailSend(email: GFunction.user.email, name: GFunction.user.fullName,movie: self.movieData.name, time:time,date:date,seats:self.count ,theatername:self.theaterData.name,address:self.theaterData.location)
+                }
+            }
+        }
+    }
     
     func getData3PM(){
         _ = Firestore.firestore().collection(cBooking).whereField(cDate, isEqualTo: self.txtDate.text?.trim() ?? "").whereField(cMID, isEqualTo: movieData.docID).whereField(cTime, isEqualTo: "3:00 PM").whereField(cTID, isEqualTo: theaterData.docID).addSnapshotListener{ querySnapshot, error in
@@ -199,7 +285,79 @@ extension SelectSeatVC: UITextFieldDelegate {
             }
         }
     }
+    
+    func emailSend(email: String, name:String,movie:String,time:String,date:String,seats:Int,theatername:String,address:String){
+        self.sendEmail( email: email, name:name,movie: movie,time:time,date:date,seats:seats,theatername:theatername,address:address){ [unowned self] (result) in
+            DispatchQueue.main.async {
+                switch result{
+                    case .success(_):
+                        Alert.shared.showAlert(message: "Your booking has been confirmed successfully !!!") { (bool) in
+                            UIApplication.shared.setTab()
+                        }
+                    case .failure(_):
+                        Alert.shared.showAlert(message: "Error", completion: nil)
+                }
+            }
+            
+        }
+    }
+    
+    func sendEmail(email: String, name:String,movie:String,time:String,date:String,seats:Int,theatername:String,address:String, completion: @escaping (Result<Void,Error>) -> Void) {
+        let apikey = "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"
+        let devemail = "udaydheerajreddy@gmail.com"
+        let count = String(seats);
+        let price : Int = (seats * 15);
+        
+        
+        
+        let data : [String:String] = [
+            "name": name,
+            "email": email,
+            "movie":movie,
+            "time":time,
+            "date":date,
+            "theatername":theatername,
+            "address":address,
+            "seats":count,
+            "price":String(price),
+            
+        ]
+        
+        
+        let personalization = TemplatedPersonalization(dynamicTemplateData: data, recipients: email)
+        let session = Session()
+        session.authentication = Authentication.apiKey(apikey)
+        
+        let from = Address(email: devemail, name: "CinemaFinder")
+        let template = Email(personalizations: [personalization], from: from, templateID: "d-62b2549a4a0b454d9d0dd4e37298109b", subject: "Your booking has been confirmed!!!")
+        
+        do {
+            try session.send(request: template, completionHandler: { (result) in
+                switch result {
+                    case .success(let response):
+                        print("Response : \(response)")
+                        completion(.success(()))
+                        
+                    case .failure(let error):
+                        print("Error : \(error)")
+                        completion(.failure(error))
+                }
+            })
+        }catch(let error){
+            print("ERROR: ")
+            completion(.failure(error))
+        }
+    }
 }
 
+extension SelectSeatVC : RazorpayPaymentCompletionProtocol {
+    func onPaymentError(_ code: Int32, description str: String) {
+        print("error: ", code, str)
+        Alert.shared.showAlert(message: str, completion: nil)
+    }
+    
+    func onPaymentSuccess(_ payment_id: String) {
+        self.createOrder(paymentId: payment_id, time: self.getTime(), date: self.txtDate.text?.trim() ?? "")
+    }
     
 }
