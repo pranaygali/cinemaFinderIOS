@@ -56,40 +56,39 @@ class AddTheaterViewController: UIViewController {
     }
     
     func addTheaterData(address: String, name:String) {
-            var ref : DocumentReference? = nil
-            ref = Firestore.firestore().collection(cTheater).addDocument(data:
-                                                                            [
-                                                                                cTName: name,
-                                                                                cTID : "",
-                                                                                cTAddress: address,
-                                                                                                         ])
-            {  err in
-                if let err = err {
-                    print("Error adding document: \(err)")
-                } else {
-                    print("Document added with ID: \(ref!.documentID)")
-                    self.update(dataID: ref!.documentID,name: name,address: address)
-                }
-            }
-        }
-        
-        func update(dataID: String,name:String,address: String) {
-            let ref = Firestore.firestore().collection(cTheater).document(dataID)
-            ref.updateData([
-                cTID: dataID,
-                cTName: name,
-                cTAddress: address,
-            ]){ err in
-                if let err = err {
-                    print("Error updating document: \(err)")
-                    self.navigationController?.popViewController(animated: true)
-                } else {
-                    print("Document successfully updated")
-                    Alert.shared.showAlert(message: self.data != nil ? "Your Theater has been updated successfully !!!" :  "Your Theater has been added successfully !!!") { (true) in
-                        self.navigationController?.popViewController(animated: true)
-                    }
-                }
+        var ref : DocumentReference? = nil
+        ref = Firestore.firestore().collection(cTheater).addDocument(data:
+                                                                        [
+                                                                            cTName: name,
+                                                                            cTID : "",
+                                                                            cTAddress: address,
+                                                                                                     ])
+        {  err in
+            if let err = err {
+                print("Error adding document: \(err)")
+            } else {
+                print("Document added with ID: \(ref!.documentID)")
+                self.update(dataID: ref!.documentID,name: name,address: address)
             }
         }
     }
-
+    
+//    func update(dataID: String,name:String,address: String) {
+//        let ref = Firestore.firestore().collection(cTheater).document(dataID)
+//        ref.updateData([
+//            cTID: dataID,
+//            cTName: name,
+//            cTAddress: address,
+//        ]){ err in
+//            if let err = err {
+//                print("Error updating document: \(err)")
+//                self.navigationController?.popViewController(animated: true)
+//            } else {
+//                print("Document successfully updated")
+//                Alert.shared.showAlert(message: self.data != nil ? "Your Theater has been updated successfully !!!" :  "Your Theater has been added successfully !!!") { (true) in
+//                    self.navigationController?.popViewController(animated: true)
+//                }
+//            }
+//        }
+//    }
+}
