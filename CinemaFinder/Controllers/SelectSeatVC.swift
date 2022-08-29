@@ -76,7 +76,8 @@ class SelectSeatVC: UIViewController {
         
         if error.isEmpty {
             self.price = Float(15 * self.count * 100)
-            let options: [String:Any] = ["amount" : price.description,
+            
+            let options: [String:Any] = [ "amount" : price.description,
                                          "description" : "Booking Movie Ticket",
                                          "currency": "CAD",
                                          "image": UIImage(named: "img"),
